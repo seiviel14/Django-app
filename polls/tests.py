@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
+from django.urls.base import reverse
 import datetime
 
 from .models import Question
@@ -27,3 +28,20 @@ class QuestionModelTests(TestCase):
         time = timezone.now()
         self.question.pub_date = time
         self.assertIs(self.question.was_published_recently(), True)
+
+class QuestionIndexViewTests(TestCase):
+
+    def setUp(self):
+        self.response = self.client.get(reverse("polls:index"))
+        self.question = Question(question_text="")
+
+    def test_no_questions(self):
+        #If no questions, an approppiate mesage should appear
+        self.assertEqual(self.response.status_code, 200)
+        self.assertContains(self.response, "No polls are available.")
+        self.assertQuerysetEqual(self.response.context["latest_question_list"], [])
+
+    def test_only_past_questions(self):
+        self.question.pub_date = timezone.now() + datetime.timedelta(days=30)
+        self.assertEqual(self.response.status_code, 200)
+        self.assertNotIn(self.question ,self.response.context["latest_question_list"])
