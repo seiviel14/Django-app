@@ -77,7 +77,19 @@ class QuestionIndexViewTests(TestCase):
 
     def test_two_future_questions(self):
         question1 = question_creator("Test7", 10)
-        question1 = question_creator("Test7", 10)
+        question1 = question_creator("Test8", 10)
         response = response_creator(self)
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(response.context["latest_question_list"], [])
+
+class QuestionDetailViewTests(TestCase):
+
+    def test_future_question(self):
+        question = question_creator("Test9", 10)
+        response = self.client.get(reverse("polls:detail", args=(question.id,)))
+        self.assertEqual(response.status_code, 404)
+        
+    def test_past_question(self):
+        question = question_creator("Test10", -10)
+        response = self.client.get(reverse("polls:detail", args=(question.id,)))
+        self.assertContains(response, question.question_text)
