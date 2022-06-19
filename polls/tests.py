@@ -93,3 +93,8 @@ class QuestionDetailViewTests(TestCase):
         question = question_creator("Test10", -10)
         response = self.client.get(reverse("polls:detail", args=(question.id,)))
         self.assertContains(response, question.question_text)
+
+#Create Results views tests
+
+
+#Create test for questions without choices (error)
